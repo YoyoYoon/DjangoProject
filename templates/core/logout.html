@@ -1,0 +1,15 @@
+<!-- templates/core/logout.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2>You have been logged out</h2>
+            <p>Thanks for visiting! Come back soon.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary">Login again</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
