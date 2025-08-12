@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
   const calendarEl = document.getElementById('calendar');
 
+  // Injected from Django template
+  const projectEvents = typeof PROJECT_EVENTS !== 'undefined' ? PROJECT_EVENTS : [];
+
   function toDateTimeLocal(dateStr) {
     if (!dateStr) return '';
     const dt = new Date(dateStr);
@@ -20,7 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
-    events: '/api/calendar/events/',
+    // Merge events from API and projects
+    events: function(fetchInfo, successCallback, failureCallback) {
+      fetch('/api/calendar/events/')
+        .then(res => res.json())
+        .then(apiEvents => {
+          // Combine API events and project events
+          successCallback(apiEvents.concat(projectEvents));
+        })
+        .catch(err => {
+          console.error('Error fetching API events:', err);
+          failureCallback(err);
+        });
+    },
     eventContent: function(info) {
       return { html: `<div>${info.event.title}</div>` };
     },
@@ -31,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('eventTitle').value = '';
       document.getElementById('startDate').value = toDateTimeLocal(selectionInfo.start);
       document.getElementById('endDate').value = toDateTimeLocal(new Date(selectionInfo.end.getTime() - 60000));
+
+      document.getElementById('repeat').value = 'none';
+      document.getElementById('repeatUntil').value = '';
 
       const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
       eventModal.show();
@@ -48,6 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('eventTitle').value = data.title;
           document.getElementById('startDate').value = toDateTimeLocal(data.start_time || data.start);
           document.getElementById('endDate').value = toDateTimeLocal(data.end_time || data.end);
+
+          document.getElementById('repeat').value = data.repeat || 'none';
+          document.getElementById('repeatUntil').value = data.repeat_until || '';
 
           document.getElementById('deleteEventBtn').style.display = 'inline-block';
 

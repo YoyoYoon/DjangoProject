@@ -42,17 +42,10 @@ class Task(models.Model):
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_done = models.BooleanField(default=False)  #   for checkbox
 
     def __str__(self):
         return f"{self.title} ({self.status})"
-
-class ProgressLog(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
-    content = models.TextField()
-
-    def __str__(self):
-        return f"Log for {self.project.title} on {self.date}"
 
 
 class CalendarEvent(models.Model):
@@ -70,6 +63,7 @@ class CalendarEvent(models.Model):
         ('monthly', 'Monthly'),
     ]
     repeat = models.CharField(max_length=10, choices=REPEAT_CHOICES, default='none', blank=True)
+    repeat_until = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.start_time} - {self.end_time if self.end_time else 'No end'})"

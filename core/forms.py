@@ -12,6 +12,7 @@ class UserRegistrationForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
+
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
@@ -29,15 +30,26 @@ class ProjectForm(forms.ModelForm):
             'due_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'status', 'priority', 'due_date']
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class TaskCompleteForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['is_done']
+
 
 class CalendarEventForm(forms.ModelForm):
     class Meta:
         model = CalendarEvent
-        fields = ['title', 'description', 'start_time', 'end_time', 'all_day', 'repeat']
+        fields = ['title', 'description', 'start_time', 'end_time', 'all_day', 'repeat', 'repeat_until']
         widgets = {
             'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),

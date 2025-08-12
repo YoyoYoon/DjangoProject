@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, Project, Task, ProgressLog
+from .models import UserProfile, Project, Task
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -18,7 +18,4 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ('status', 'priority')
     search_fields = ('title',)
 
-@admin.register(ProgressLog)
-class ProgressLogAdmin(admin.ModelAdmin):
-    list_display = ('project', 'date')
-    search_fields = ('project__title', 'content')
+
