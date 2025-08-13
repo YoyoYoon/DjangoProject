@@ -96,6 +96,8 @@ class CalendarEvent(models.Model):
         # Ensure repeat_until is after start_time
         if self.repeat != 'none' and self.repeat_until:
             repeat_until_dt = datetime.combine(self.repeat_until, time.min)
+            if timezone.is_naive(repeat_until_dt):
+                repeat_until_dt = timezone.make_aware(repeat_until_dt, timezone.get_current_timezone())
             if repeat_until_dt < self.start_time:
                 raise ValidationError("Repeat until date cannot be before start date.")
 
