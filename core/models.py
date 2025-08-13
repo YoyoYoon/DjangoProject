@@ -1,4 +1,6 @@
+from django.utils import timezone
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
 # Create your models here.
@@ -18,6 +20,14 @@ class Project(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.DateField(null=True, blank=True)
+
+    def clean(self):
+        if self.due_date and self.created_at and self.due_date < self.created_at.date():
+            raise ValidationError("Project due date cannot be before the creation date.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -44,6 +54,15 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_done = models.BooleanField(default=False)  #   for checkbox
 
+    def clean(self):
+        if self.due_date and self.due_date < timezone.now().date():
+            raise ValidationError("Task due date cannot be in the past.")
+
+    def save(self, *args, **kwargs):
+
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.title} ({self.status})"
 
@@ -65,6 +84,16 @@ class CalendarEvent(models.Model):
     repeat = models.CharField(max_length=10, choices=REPEAT_CHOICES, default='none', blank=True)
     repeat_until = models.DateField(null=True, blank=True)
 
+    def clean(self):
+        if self.end_time and self.start_time > self.end_time:
+            raise ValidationError("End time cannot be before start time.")
+        if self.repeat != 'none' and self.repeat_until and self.repeat_until < self.start_time.date():
+            raise ValidationError("Repeat until date cannot be before start date.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.title} ({self.start_time} - {self.end_time if self.end_time else 'No end'})"
 
@@ -84,6 +113,14 @@ class Habit(models.Model):
     end_date = models.DateField(null=True, blank=True)
     repeat = models.CharField(max_length=10, choices=REPEAT_CHOICES, default='daily')
     active = models.BooleanField(default=True)
+
+    def clean(self):
+        if self.end_date and self.end_date < self.start_date:
+            raise ValidationError("Habit end date cannot be before start date.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} ({self.repeat})"

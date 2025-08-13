@@ -8,9 +8,8 @@
   <p>Hello, {{ user.username }}!</p>
 
   <a href="{% url 'profile_detail' %}" class="btn btn-info">My Profile</a>
-
-  <a href="{% url 'project_list' %}" class="btn btn-primary">View My Projects</a>
-
+  <a href="{% url 'habit-list' %}" class="btn btn-success">Habits</a>
+  <a href="{% url 'project_list' %}" class="btn btn-primary">Projects</a>
   <a href="{% url 'calendar' %}" class="btn btn-warning">Calendar</a>
 
 {% else %}

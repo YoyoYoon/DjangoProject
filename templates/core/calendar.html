@@ -75,12 +75,9 @@
       </div>
     </div>
   </div>
+
 {% endblock %}
 
 {% block extra_scripts %}
-  <script>
-      const PROJECT_EVENTS = {{ events_json|safe }};
-  </script>
-
   <script src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}

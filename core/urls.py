@@ -21,6 +21,8 @@ urlpatterns = [
     path('projects/<int:pk>/', ProjectDetailView.as_view(), name='project_detail'),
     path('projects/<int:pk>/edit/', ProjectUpdateView.as_view(), name='project_edit'),
     path('projects/<int:pk>/delete/', ProjectDeleteView.as_view(), name='project_delete'),
+    path('api/projects/json/', views.projects_json, name='projects-json'),
+
 
     path('tasks/<int:pk>/edit/', TaskUpdateView.as_view(), name='task_edit'),
     path('tasks/<int:pk>/delete/', TaskDeleteView.as_view(), name='task_delete'),
@@ -30,6 +32,7 @@ urlpatterns = [
     path('habits/', HabitListView.as_view(), name='habit-list'),
     path('habits/create/', HabitCreateView.as_view(), name='habit-create'),
     path('habits/<int:pk>/edit/', HabitUpdateView.as_view(), name='habit-edit'),
+    path('api/habits/json/', views.habits_json, name='habits-json'),
 
     path('calendar/', views.calendar_view, name='calendar'),
     path('api/calendar/events/', views.calendar_events_json, name='calendar_events_json'),

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_filters %}
 {% block title %}
   {% if form.instance.pk %}Edit Habit{% else %}Create Habit{% endif %}
@@ -14,4 +15,7 @@
       {% if form.instance.pk %}Update{% else %}Save{% endif %}
     </button>
   </form>
+{% endblock %}
+{% block extra_scripts %}
+  <script src="{% static 'js/form_validation.js' %}"></script>
 {% endblock %}

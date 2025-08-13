@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const calendarEl = document.getElementById('calendar');
 
-  const projectEvents = typeof PROJECT_EVENTS !== 'undefined' ? PROJECT_EVENTS : [];
-
   function toDateTimeLocal(dateStr) {
     if (!dateStr) return '';
     const dt = new Date(dateStr);
@@ -23,31 +21,56 @@ document.addEventListener('DOMContentLoaded', function() {
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
     events: function(fetchInfo, successCallback, failureCallback) {
-      fetch('/api/calendar/events/')
-        .then(res => res.json())
-        .then(apiEvents => successCallback(apiEvents.concat(projectEvents)))
-        .catch(err => failureCallback(err));
+      Promise.all([
+        fetch('/api/calendar/events/').then(res => res.json()),
+        fetch('/api/habits/json/').then(res => res.json()),
+        fetch('/api/projects/json/').then(res => res.json()) // fetch projects
+      ])
+      .then(([eventsData, habitsData, projectsData]) => {
+        // mark type for redirect handling
+        const projects = projectsData.map(p => ({
+          id: p.id,
+          title: p.title,
+          start: p.created_at || new Date().toISOString(),
+          end: p.due_date || p.created_at || new Date().toISOString(),
+          extendedProps: { type: 'project' }
+        }));
+        successCallback(eventsData.concat(habitsData, projects));
+      })
+      .catch(err => failureCallback(err));
     },
     eventContent: function(info) {
       return { html: `<div>${info.event.title}</div>` };
     },
     select: function(selectionInfo) {
+      // Reset modal for new calendar event
       document.getElementById('eventId').value = '';
       document.getElementById('deleteEventBtn').style.display = 'none';
-
       document.getElementById('eventTitle').value = '';
       document.getElementById('startDate').value = toDateTimeLocal(selectionInfo.start);
       document.getElementById('endDate').value = toDateTimeLocal(new Date(selectionInfo.end.getTime() - 60000));
-
       document.getElementById('repeat').value = 'none';
       document.getElementById('repeatUntil').value = '';
-      document.getElementById('allDay').checked = false;  // Reset all-day
-
+      document.getElementById('allDay').checked = false;
       new bootstrap.Modal(document.getElementById('eventModal')).show();
     },
     eventClick: function(info) {
-      const eventId = info.event.id;
+      // HABIT
+      if (info.event.extendedProps.type === 'habit') {
+        const habitId = info.event.id.split('-')[1];
+        window.location.href = `/habits/${habitId}/edit/`;
+        return;
+      }
 
+      // PROJECT
+      if (info.event.extendedProps.type === 'project') {
+        const projectId = info.event.id;
+        window.location.href = `/projects/${projectId}/edit/`;
+        return;
+      }
+
+      // CALENDAR EVENT
+      const eventId = info.event.id;
       fetch(`/api/calendar/events/${eventId}/update/`)
         .then(res => {
           if (!res.ok) throw new Error('Failed to load event data');
@@ -60,10 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('endDate').value = toDateTimeLocal(data.end_time || data.end);
           document.getElementById('repeat').value = data.repeat || 'none';
           document.getElementById('repeatUntil').value = data.repeat_until || '';
-          document.getElementById('allDay').checked = !!data.all_day; // Set all-day
-
+          document.getElementById('allDay').checked = !!data.all_day;
           document.getElementById('deleteEventBtn').style.display = 'inline-block';
-
           new bootstrap.Modal(document.getElementById('eventModal')).show();
         })
         .catch(err => alert(err.message));
@@ -83,16 +104,16 @@ document.addEventListener('DOMContentLoaded', function() {
     return cookieValue;
   }
 
+  // SAVE EVENT
   document.getElementById('eventForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = e.target;
     const eventId = document.getElementById('eventId').value;
-
     let url = '/api/calendar/events/create/';
     if (eventId) url = `/api/calendar/events/${eventId}/update/`;
 
     const formData = new FormData(form);
-    formData.set('all_day', document.getElementById('allDay').checked ? 'true' : 'false'); // Include all-day
+    formData.set('all_day', document.getElementById('allDay').checked ? 'true' : 'false');
 
     fetch(url, {
       method: 'POST',
@@ -116,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(err => alert('Failed to save event: ' + err.message));
   });
 
+  // DELETE EVENT
   document.getElementById('deleteEventBtn').addEventListener('click', function() {
     const eventId = document.getElementById('eventId').value;
     if (!eventId || !confirm('Are you sure you want to delete this event?')) return;
