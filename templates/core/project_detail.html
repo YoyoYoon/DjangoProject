@@ -18,13 +18,20 @@
 
     <h4>Tasks</h4>
     {% if tasks %}
-    <ul class="list-group mb-3">
+    <ul id="task-list" class="list-group mb-3">
         {% for task in tasks %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <input type="checkbox" class="task-toggle me-2" data-task-id="{{ task.pk }}" {% if task.status == 'completed' %}checked{% endif %}>
+                <input
+                    type="checkbox"
+                    class="task-toggle me-2"
+                    data-task-id="{{ task.pk }}"
+                    {% if task.status == 'completed' %}checked{% endif %}
+                />
                 <div>
-                    <strong {% if task.status == 'completed' %}style="text-decoration: line-through;"{% endif %}>{{ task.title }}</strong>
+                    <strong class="task-title {% if task.status == 'completed' %}completed-task{% endif %}">
+                        {{ task.title }}
+                    </strong>
                     <br>
                     <small>Status: <span class="task-status-text">{{ task.get_status_display }}</span></small> |
                     <small>Priority: {{ task.get_priority_display }}</small>

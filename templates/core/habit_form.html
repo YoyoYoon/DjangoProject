@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+{% block title %}
+  {% if form.instance.pk %}Edit Habit{% else %}Create Habit{% endif %}
+{% endblock %}
+
+{% block content %}
+  <h2>{% if form.instance.pk %}Edit Habit{% else %}Create New Habit{% endif %}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success">
+      {% if form.instance.pk %}Update{% else %}Save{% endif %}
+    </button>
+  </form>
+{% endblock %}

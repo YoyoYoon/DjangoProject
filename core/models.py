@@ -69,3 +69,23 @@ class CalendarEvent(models.Model):
         return f"{self.title} ({self.start_time} - {self.end_time if self.end_time else 'No end'})"
 
 
+class Habit(models.Model):
+    REPEAT_CHOICES = [
+        ('none', 'Does not repeat'),
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('monthly', 'Monthly'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='habits')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    repeat = models.CharField(max_length=10, choices=REPEAT_CHOICES, default='daily')
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.repeat})"
+
+

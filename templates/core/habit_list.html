@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Your Habits</h2>
+    <a href="{% url 'habit-create' %}" class="btn btn-success">Add Habit</a>
+  </div>
+
+  {% if habits %}
+    <form id="habitListForm">
+      <ul class="list-group">
+        {% for habit in habits %}
+              <li class="list-group-item d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="checkbox"
+                    class="habit-completed-checkbox me-3"
+                    data-habit-id="{{ habit.id }}"
+                    id="habit-checkbox-{{ habit.id }}"
+                  />
+                  <a href="{% url 'habit-edit' habit.id %}" class="habit-title mb-0">
+                    {{ habit.title }}
+                  </a>
+                </div>
+              </li>
+            {% endfor %}
+
+      </ul>
+    </form>
+  {% else %}
+    <p>You have no active habits.</p>
+  {% endif %}
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script src="{% static 'js/habit_list.js' %}"></script>
+{% endblock %}
+
+

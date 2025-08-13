@@ -35,6 +35,12 @@
               <label for="eventTitle" class="form-label">Event Title</label>
               <input type="text" id="eventTitle" name="title" class="form-control" required>
             </div>
+
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="allDay" name="all_day">
+              <label class="form-check-label" for="allDay">All Day Event</label>
+            </div>
+
             <div class="mb-3">
               <label for="startDate" class="form-label">Start Date & Time</label>
               <input type="datetime-local" id="startDate" name="start_time" class="form-control" required>
@@ -43,21 +49,23 @@
               <label for="endDate" class="form-label">End Date & Time</label>
               <input type="datetime-local" id="endDate" name="end_time" class="form-control" required>
             </div>
-              <div class="mb-3">
-                  <label for="repeat" class="form-label">Repeat</label>
-                  <select id="repeat" name="repeat" class="form-control">
-                    <option value="none">Does not repeat</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                  </select>
-                </div>
 
-                <div class="mb-3">
-                  <label for="repeatUntil" class="form-label">Repeat Until</label>
-                  <input type="date" id="repeatUntil" name="repeat_until" class="form-control">
-                </div>
+            <div class="mb-3">
+              <label for="repeat" class="form-label">Repeat</label>
+              <select id="repeat" name="repeat" class="form-control">
+                <option value="none">Does not repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="repeatUntil" class="form-label">Repeat Until</label>
+              <input type="date" id="repeatUntil" name="repeat_until" class="form-control">
+            </div>
           </div>
+
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" id="deleteEventBtn" class="btn btn-danger" style="display:none;">Delete Event</button>
@@ -69,12 +77,10 @@
   </div>
 {% endblock %}
 
-
-
 {% block extra_scripts %}
-    <script>
-        const PROJECT_EVENTS = {{ events_json|safe }};
-    </script>
+  <script>
+      const PROJECT_EVENTS = {{ events_json|safe }};
+  </script>
 
   <script src="{% static 'js/calendar.js' %}"></script>
 {% endblock %}

@@ -4,7 +4,7 @@ from . import views
 from .views import (
     HomeView, RegisterView, DashboardView,
     ProjectListView, ProjectDetailView, CreateProjectView, AddTaskView, ProjectUpdateView, ProjectDeleteView,
-    TaskUpdateView, TaskDeleteView, ToggleTaskDoneView
+    TaskUpdateView, TaskDeleteView, ToggleTaskDoneView, HabitListView, HabitCreateView, HabitUpdateView
 )
 
 urlpatterns = [
@@ -27,6 +27,9 @@ urlpatterns = [
     path('projects/<int:project_id>/tasks/add/', AddTaskView.as_view(), name='add_task'),
     path('tasks/<int:pk>/toggle_done/', ToggleTaskDoneView.as_view(), name='toggle_task_done'),
 
+    path('habits/', HabitListView.as_view(), name='habit-list'),
+    path('habits/create/', HabitCreateView.as_view(), name='habit-create'),
+    path('habits/<int:pk>/edit/', HabitUpdateView.as_view(), name='habit-edit'),
 
     path('calendar/', views.calendar_view, name='calendar'),
     path('api/calendar/events/', views.calendar_events_json, name='calendar_events_json'),

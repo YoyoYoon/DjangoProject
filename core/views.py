@@ -6,8 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
-from .forms import UserRegistrationForm, ProjectForm, TaskForm, CalendarEventForm, UserProfileForm
-from .models import Project, Task, CalendarEvent, UserProfile
+from .forms import UserRegistrationForm, ProjectForm, TaskForm, CalendarEventForm, UserProfileForm, HabitForm
+from .models import Project, Task, CalendarEvent, UserProfile, Habit
 from django.http import JsonResponse
 import json
 from .validations import validate_project_owner
@@ -96,16 +96,13 @@ class AddTaskView(LoginRequiredMixin, CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Assign the current project to the task before saving
         form.instance.project = self.project
         return super().form_valid(form)
 
     def get_success_url(self):
-        # Redirect back to the project detail page after adding a task
         return redirect('project_detail', pk=self.project.pk).url
 
     def get_context_data(self, **kwargs):
-        # Add project to the context so template can use it
         context = super().get_context_data(**kwargs)
         context['project'] = self.project
         return context
@@ -197,40 +194,44 @@ def calendar_events_json(request):
     events = CalendarEvent.objects.filter(user=request.user)
     data = []
 
+    # Optional view range from FullCalendar
     start_param = request.GET.get('start')  # e.g., "2025-08-01"
-    end_param = request.GET.get('end')
+    end_param = request.GET.get('end')      # e.g., "2025-08-31"
     view_start = datetime.fromisoformat(start_param) if start_param else None
     view_end = datetime.fromisoformat(end_param) if end_param else None
 
     for event in events:
+        # Base event
         data.append({
-            'id': event.id,
+            'id': str(event.id),
             'title': event.title,
             'start': event.start_time.isoformat(),
             'end': event.end_time.isoformat() if event.end_time else None,
-            'allDay': event.all_day,
+            'allDay': event.all_day,  # <-- all_day flag
             'description': event.description,
             'repeat': event.repeat,
         })
-        # Generate repeated events
-        if event.repeat != 'none':
+
+        # Handle repeated events
+        if event.repeat != 'none' and event.repeat_until:
             current_start = event.start_time
             current_end = event.end_time
-            repeat_until = getattr(event, "repeat_until", None)  # If you add this field later
+            repeat_until = event.repeat_until
+
+            occurrence_count = 0
+            MAX_OCCURRENCES = 100
 
             while True:
+                # Increment occurrence
                 if event.repeat == 'daily':
                     current_start += timedelta(days=1)
                     if current_end:
                         current_end += timedelta(days=1)
-
                 elif event.repeat == 'weekly':
                     current_start += timedelta(weeks=1)
                     if current_end:
                         current_end += timedelta(weeks=1)
-
                 elif event.repeat == 'monthly':
-                    # Calculate next month safely
                     month = current_start.month + 1
                     year = current_start.year
                     if month > 12:
@@ -250,21 +251,29 @@ def calendar_events_json(request):
                         day_end = min(current_end.day, last_day_end)
                         current_end = current_end.replace(year=year_end, month=month_end, day=day_end)
 
-                # Stop if past `repeat_until` (if you add that field)
-                if repeat_until and current_start.date() > repeat_until:
+                occurrence_count += 1
+                if occurrence_count > MAX_OCCURRENCES:
+                    break  # safety break
+
+                # Stop if past repeat_until
+                if current_start.date() > repeat_until:
                     break
 
-                # Stop if it’s past the view range (optimization)
+                # Stop if past view_end (optimization)
                 if view_end and current_start > view_end:
                     break
 
-                # Add the generated occurrence
+                # Skip events before view_start
+                if view_start and current_start < view_start:
+                    continue
+
+                # Add repeated occurrence
                 data.append({
-                    'id': f"{event.id}-{current_start.date()}",  # unique ID for repeated occurrence
+                    'id': f"{event.id}-{current_start.date()}",
                     'title': event.title,
                     'start': current_start.isoformat(),
                     'end': current_end.isoformat() if current_end else None,
-                    'allDay': event.all_day,
+                    'allDay': event.all_day,  # <-- all_day flag included
                     'description': event.description,
                     'repeat': event.repeat,
                 })
@@ -335,3 +344,31 @@ def event_detail(request, event_id):
         'repeat': event.repeat,
     }
     return JsonResponse(data)
+
+
+class HabitListView(LoginRequiredMixin, ListView):
+    model = Habit
+    template_name = 'core/habit_list.html'
+    context_object_name = 'habits'
+
+    def get_queryset(self):
+        return Habit.objects.filter(user=self.request.user, active=True).order_by('title')
+
+class HabitCreateView(LoginRequiredMixin, CreateView):
+    model = Habit
+    form_class = HabitForm
+    template_name = 'core/habit_form.html'
+    success_url = reverse_lazy('habit-list')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+class HabitUpdateView(LoginRequiredMixin, UpdateView):
+    model = Habit
+    form_class = HabitForm
+    template_name = 'core/habit_form.html'
+    success_url = reverse_lazy('habit-list')
+
+    def get_queryset(self):
+        return Habit.objects.filter(user=self.request.user)

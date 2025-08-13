@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from core.models import Project, Task, CalendarEvent, UserProfile
+from django.utils.timezone import localdate
+
+from core.models import Project, Task, CalendarEvent, UserProfile, Habit
 from core.validations import validate_event_times, validate_not_in_past
 
 
@@ -71,3 +73,26 @@ class CalendarEventForm(forms.ModelForm):
             validate_not_in_past(start_time)
 
         return cleaned_data
+
+    def clean_repeat_until(self):
+        repeat_until = self.cleaned_data.get('repeat_until')
+        if repeat_until and repeat_until < self.cleaned_data.get('start_time').date():
+            raise forms.ValidationError("Repeat until cannot be before start date")
+        return repeat_until
+
+
+class HabitForm(forms.ModelForm):
+    class Meta:
+        model = Habit
+        fields = ['title', 'description', 'start_date', 'end_date', 'repeat', 'active']
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set initial start_date to today
+        if not self.instance.pk:
+            self.instance.start_date = localdate()
