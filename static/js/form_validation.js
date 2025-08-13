@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Generic validation function
   function validateForm(form) {
     const title = form.querySelector('[name="title"]');
     if (!title || !title.value.trim()) {

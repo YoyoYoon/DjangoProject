@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const calendarEl = document.getElementById('calendar');
 
+//format a Date object to "YYYY-MM-DDTHH:MM"
   function toDateTimeLocal(dateStr) {
     if (!dateStr) return '';
     const dt = new Date(dateStr);
@@ -20,14 +21,16 @@ document.addEventListener('DOMContentLoaded', function() {
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
+
+       // Load events from multiple api
     events: function(fetchInfo, successCallback, failureCallback) {
       Promise.all([
         fetch('/api/calendar/events/').then(res => res.json()),
         fetch('/api/habits/json/').then(res => res.json()),
-        fetch('/api/projects/json/').then(res => res.json()) // fetch projects
+        fetch('/api/projects/json/').then(res => res.json())
       ])
       .then(([eventsData, habitsData, projectsData]) => {
-        // mark type for redirect handling
+          // Map projects into FullCalendar format
         const projects = projectsData.map(p => ({
           id: p.id,
           title: p.title,
@@ -39,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(err => failureCallback(err));
     },
+
+      // customize how events appear in calendar
     eventContent: function(info) {
       return { html: `<div>${info.event.title}</div>` };
     },
@@ -55,21 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
       new bootstrap.Modal(document.getElementById('eventModal')).show();
     },
     eventClick: function(info) {
-      // HABIT
+      // if habit, redirect
       if (info.event.extendedProps.type === 'habit') {
         const habitId = info.event.id.split('-')[1];
         window.location.href = `/habits/${habitId}/edit/`;
         return;
       }
 
-      // PROJECT
+      // if project
       if (info.event.extendedProps.type === 'project') {
         const projectId = info.event.id;
         window.location.href = `/projects/${projectId}/edit/`;
         return;
       }
 
-      // CALENDAR EVENT
+      // otherwise, fetch calendar event details
       const eventId = info.event.id;
       fetch(`/api/calendar/events/${eventId}/update/`)
         .then(res => {
@@ -104,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return cookieValue;
   }
 
-  // SAVE EVENT
+  // save event
   document.getElementById('eventForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = e.target;
@@ -137,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(err => alert('Failed to save event: ' + err.message));
   });
 
-  // DELETE EVENT
+  // delete event
   document.getElementById('deleteEventBtn').addEventListener('click', function() {
     const eventId = document.getElementById('eventId').value;
     if (!eventId || !confirm('Are you sure you want to delete this event?')) return;

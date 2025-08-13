@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import UserProfile, Project, Task, CalendarEvent, Habit
 
-
+# Inline display of tasks inside a project
 class TaskInline(admin.TabularInline):
     model = Task
     extra = 0
@@ -16,7 +16,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_filter = ['due_date', 'owner']
     search_fields = ['title', 'description', 'owner__username']
     ordering = ['-created_at']
-    inlines = [TaskInline]
+    inlines = [TaskInline] # Show tasks inline
 
 
 @admin.register(Task)

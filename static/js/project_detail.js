@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
-  // === FullCalendar setup ===
+  // fullcalendar setup
   if (calendarEl) {
     const calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
+
+        // Load events dynamically from API
       events: function(fetchInfo, successCallback, failureCallback) {
         fetch('/api/calendar/events/')
           .then(res => res.json())
@@ -43,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('allDayCheckbox').checked = false;
         eventModal.show();
       },
+
+        // When click an existing event
       eventClick: function(info) {
         const eventId = info.event.id;
         fetch(`/api/calendar/events/${eventId}/update/`)
@@ -81,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return cookieValue;
   }
 
-  // === TASK STATUS UPDATE ONLY ===
+  // task status update
   const taskList = document.getElementById('task-list');
   if (taskList) {
     taskList.addEventListener('change', function(e) {
@@ -118,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // === EVENT FORM SUBMIT & DELETE (unchanged) ===
+  // event form submit
   const eventForm = document.getElementById('eventForm');
   if (eventForm) {
     eventForm.addEventListener('submit', function(e) {
@@ -148,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  //delete event
   const deleteBtn = document.getElementById('deleteEventBtn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', function() {

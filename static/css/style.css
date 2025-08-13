@@ -58,6 +58,8 @@ a:hover {
 }
 
 /* === Buttons === */
+
+
 .btn {
     border-radius: 20px;
     padding: 8px 18px;
@@ -104,6 +106,25 @@ a:hover {
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
+.btn-warning {
+    background-color: #f7d27c;
+    border: none;
+    color: #2a4d3e;
+}
+.btn-warning:hover {
+    background-color: #e6b85c;
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: #b3d9d9;
+    border: none;
+    color: #2a4d3e;
+}
+.btn-secondary:hover {
+    background-color: #94c5c5;
+    color: #fff;
+}
 
 /* === Project / Habit list items === */
 .list-group-item a {
@@ -199,3 +220,4 @@ input[type="checkbox"] {
     color: #fff;
     transform: translateY(-2px);
 }
+

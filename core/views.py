@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -11,12 +11,9 @@ from .forms import UserRegistrationForm, ProjectForm, TaskForm, CalendarEventFor
 from .models import Project, Task, CalendarEvent, UserProfile, Habit
 from django.http import JsonResponse
 import json
-from .validations import validate_project_owner
+from .validations import validate_project_owner, validate_task_owner, validate_event_owner
 import calendar
 from django.contrib import messages
-
-
-# Create your views here.
 
 
 # Home & User Management Views
@@ -61,7 +58,6 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     def get_object(self, queryset=None):
         profile, _ = UserProfile.objects.get_or_create(user=self.request.user)
         return profile
-
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'core/dashboard.html'
@@ -201,8 +197,8 @@ class TaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'core/task_form.html'
 
     def test_func(self):
-        task = self.get_object()
-        return task.project.owner == self.request.user
+        task = validate_task_owner(self.request.user, self.get_object().id)
+        return True
 
     def form_valid(self, form):
         try:
@@ -223,8 +219,8 @@ class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'core/task_confirm_delete.html'
 
     def test_func(self):
-        task = self.get_object()
-        return task.project.owner == self.request.user
+        task = validate_task_owner(self.request.user, self.get_object().id)
+        return True
 
     def get_success_url(self):
         return reverse_lazy('project_detail', kwargs={'pk': self.object.project.pk})
@@ -240,7 +236,7 @@ class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class ToggleTaskDoneView(LoginRequiredMixin, View):
     def post(self, request, pk):
         try:
-            task = get_object_or_404(Task, id=pk, project__owner=request.user)
+            task = validate_task_owner(request.user, pk)
             data = json.loads(request.body)
             done = data.get('done', False)
             task.status = 'completed' if done else 'pending'
@@ -381,7 +377,7 @@ def add_event(request):
 @csrf_exempt
 @login_required
 def update_event(request, event_id):
-    event = get_object_or_404(CalendarEvent, id=event_id)
+    event = validate_event_owner(request.user, event_id)
 
     if request.method == 'GET':
         return JsonResponse({
@@ -414,7 +410,7 @@ def delete_event(request, event_id):
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
     try:
-        event = get_object_or_404(CalendarEvent, pk=event_id, user=request.user)
+        event = validate_event_owner(request.user, event_id)
         event.delete()
         return JsonResponse({'status': 'success'})
     except Exception as e:
@@ -424,7 +420,7 @@ def delete_event(request, event_id):
 @login_required
 def event_detail(request, event_id):
     try:
-        event = get_object_or_404(CalendarEvent, pk=event_id, user=request.user)
+        event = validate_event_owner(request.user, event_id)
         data = {
             'id': event.id,
             'title': event.title,
@@ -498,7 +494,6 @@ def habits_json(request):
         current_date = habit.start_date
         end_date = habit.end_date or habit.start_date  # If no end date, treat as single day
 
-        # Generate occurrences according to repeat
         while current_date <= end_date:
             # Skip if outside view range
             if view_end and current_date > view_end.date():
