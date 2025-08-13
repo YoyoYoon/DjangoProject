@@ -1,0 +1,201 @@
+/* === Global Styles === */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #d1f7e0, #cdefff);
+    color: #333;
+    min-height: 100vh;
+}
+
+/* Headings */
+h1, h2, h3 {
+    font-weight: 600;
+    color: #2a4d3e;
+}
+
+/* === Navbar === */
+.navbar {
+    background: linear-gradient(90deg, #cdefff, #d1f7e0);
+    border-radius: 0 0 20px 20px; /* rounded bottom */
+    padding: 10px 20px;
+}
+
+.navbar .navbar-brand {
+    color: #2a4d3e;
+    font-weight: 600;
+}
+
+.navbar .btn {
+    border-radius: 20px;
+    font-weight: 500;
+    padding: 5px 15px;
+    color: #2a4d3e;
+    background-color: #88d4b3; /* soft green */
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.navbar .btn:hover {
+    background-color: #6bbd99; /* slightly darker green */
+    color: #fff;
+}
+
+/* Remove black side buttons and extra contrasts */
+.navbar .d-flex {
+    gap: 10px;
+}
+
+/* === Links inside projects/habits === */
+a {
+    text-decoration: none;
+    color: #4da3a9;
+    font-weight: 500;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+a:hover {
+    color: #3b7d82;
+    text-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+/* === Buttons === */
+.btn {
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.btn-success {
+    background-color: #88d4b3;
+    border: none;
+}
+.btn-success:hover {
+    background-color: #6bbd99;
+}
+.btn-primary {
+    background-color: #7cc7e3;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #5caecb;
+}
+.btn-danger {
+    background-color: #f79a9a;
+    border: none;
+}
+.btn-danger:hover {
+    background-color: #e27878;
+}
+.dashboard-btn {
+    display: inline-block;
+    padding: 10px 25px;
+    border-radius: 25px;
+    background-color: #88d4b3;
+    color: #2a4d3e;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.dashboard-btn:hover {
+    background-color: #6bbd99;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+
+/* === Project / Habit list items === */
+.list-group-item a {
+    color: #2a4d3e; /* soft green for links inside items */
+    font-weight: 600;
+}
+.list-group-item a:hover {
+    color: #1f3f33;
+    text-decoration: none;
+}
+
+/* === Cards / Containers === */
+.container, .modal-content {
+    background: #ffffffcc;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* === Calendar Styling === */
+#calendar {
+    background: #ffffffcc;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* === Habit Checkboxes === */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #88d4b3;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.habit-title {
+    font-size: 1.1em;
+    color: #2a4d3e;
+}
+
+/* === Modal Header/Footer === */
+.modal-header, .modal-footer {
+    border: none;
+}
+
+/* Smooth transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/*profile*/
+.profile-container {
+    background-color: #e0f7f3; /* light relaxing green */
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #88d4b3; /* pastel border */
+}
+
+.profile-pic.placeholder {
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #ccece0;
+    line-height: 150px;
+    color: #2a4d3e;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.profile-btn {
+    margin-top: 15px;
+    border-radius: 25px;
+    padding: 10px 25px;
+    background-color: #88d4b3;
+    color: #2a4d3e;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.profile-btn:hover {
+    background-color: #6bbd99;
+    color: #fff;
+    transform: translateY(-2px);
+}

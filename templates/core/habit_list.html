@@ -7,35 +7,36 @@
     <a href="{% url 'habit-create' %}" class="btn btn-success">Add Habit</a>
   </div>
 
+  <p class="text-muted">
+    Build consistency one step at a time.
+    Track your daily habits, stay motivated, and watch your progress grow.
+  </p>
+
   {% if habits %}
     <form id="habitListForm">
       <ul class="list-group">
         {% for habit in habits %}
-              <li class="list-group-item d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                  <input
-                    type="checkbox"
-                    class="habit-completed-checkbox me-3"
-                    data-habit-id="{{ habit.id }}"
-                    id="habit-checkbox-{{ habit.id }}"
-                  />
-                  <a href="{% url 'habit-edit' habit.id %}" class="habit-title mb-0">
-                    {{ habit.title }}
-                  </a>
-                </div>
-              </li>
-            {% endfor %}
-
+          <li class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <input
+                type="checkbox"
+                class="habit-completed-checkbox me-3"
+                data-habit-id="{{ habit.id }}"
+                id="habit-checkbox-{{ habit.id }}"
+              />
+              <a href="{% url 'habit-edit' habit.id %}" class="habit-title mb-0">
+                {{ habit.title }}
+              </a>
+            </div>
+          </li>
+        {% endfor %}
       </ul>
     </form>
   {% else %}
-    <p>You have no active habits.</p>
+    <p>You have no active habits yet. Add your first one to start building momentum!</p>
   {% endif %}
 {% endblock %}
-
 
 {% block extra_scripts %}
 <script src="{% static 'js/habit_list.js' %}"></script>
 {% endblock %}
-
-

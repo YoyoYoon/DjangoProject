@@ -4,6 +4,11 @@
 {% block content %}
 <h2>My Projects</h2>
 
+<p class="text-muted">
+  Keep all your ideas and plans in one place.
+  Add your newest project concepts, break them down into tasks, and track your progress step by step.
+</p>
+
 {% if projects %}
     <ul class="list-group">
         {% for project in projects %}
@@ -17,7 +22,7 @@
         {% endfor %}
     </ul>
 {% else %}
-    <p>You don't have any projects yet.</p>
+    <p>You don't have any projects yet. Start by adding your first one!</p>
 {% endif %}
 
 <br>
